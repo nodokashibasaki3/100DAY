@@ -22,7 +22,7 @@ A voice-based task management app for students that provides realistic feedback 
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/student-task-advisor.git
+   git clone https://github.com/nodokashibasaki3/100DAY.git
    cd student-task-advisor
    ```
 

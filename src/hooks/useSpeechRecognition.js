@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 const useSpeechRecognition = ({ onResult, onError }) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
+  const transcriptRef = useRef('');
   
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -13,7 +14,7 @@ const useSpeechRecognition = ({ onResult, onError }) => {
       
       recognitionRef.current.onresult = (event) => {
         let interimTranscript = '';
-        let finalTranscript = '';
+        let finalTranscript = transcriptRef.current;
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
@@ -24,6 +25,10 @@ const useSpeechRecognition = ({ onResult, onError }) => {
           }
         }
         
+        // Update the reference to maintain state between callback executions
+        transcriptRef.current = finalTranscript;
+        
+        // Call the onResult callback with the combined transcript
         onResult(finalTranscript || interimTranscript);
       };
       
@@ -48,14 +53,24 @@ const useSpeechRecognition = ({ onResult, onError }) => {
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
+      // Reset transcript when starting a new recording session
+      // Comment the next line if you want to continue from previous recording
+      // transcriptRef.current = '';
+      
       recognitionRef.current.start();
       setIsListening(true);
     }
   };
   
+  const resetTranscript = () => {
+    transcriptRef.current = '';
+    onResult('');
+  };
+  
   return {
     isListening,
     toggleListening,
+    resetTranscript,
     recognition: recognitionRef.current
   };
 };
